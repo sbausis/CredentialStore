@@ -81,7 +81,7 @@ AliasesToExport = '*'
 # ModuleList = @()
 
 # List of all files packaged with this module
-FileList = @('CredentialStore.psm1','OP CredentialStore.psd1')
+FileList = @('CredentialStore.psm1','CredentialStore.psd1')
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess
 # PrivateData = ''
