@@ -21,8 +21,12 @@
 
 ################################################################################
 
-function NewCredentialsKey($file) {
+function NewCredentialsKey($file, $force=$false) {
 	Try {
+		If ((Test-Path $file) -And ($force -eq $false)){
+			Write-Verbose "Key File already exists.!."
+			return $true
+		}
 		$Key = New-Object Byte[] 16   # You can use 16, 24, or 32 for AES
 		[Security.Cryptography.RNGCryptoServiceProvider]::Create().GetBytes($Key)
 		$Key | out-file $file
