@@ -94,7 +94,7 @@ function CredentialsFromFile($file, $keyfile, $username) {
 #	$PasswordFile = $PSScriptRoot + "\TCPServer.pass"
 #	$KeyFile = $PSScriptRoot + "\TCPServer.key"
 #	$Key = Get-Content $KeyFile
-#	$Password = "abcd" | ConvertTo-SecureString -AsPlainText -Force
+#	$Key | ConvertTo-SecureString -AsPlainText -Force
 #	$Password | ConvertFrom-SecureString -key $Key | Out-File $PasswordFile
 #}
 
