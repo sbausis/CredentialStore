@@ -33,7 +33,6 @@ function NewCredentialsKey($file, $force=$false) {
 	} Catch {
 		Write-Verbose "Failed to create $file"
 		return $false
-		Break
 	}
 	return $true
 }
@@ -41,14 +40,13 @@ function NewCredentialsKey($file, $force=$false) {
 function GetCredentialsKey($file) {
 	$key = $null
 	Try {
-		$fullPath = Resolve-Path $file
-		if (-not ($fullPath | Test-Path)) {
-			NewCredentialsKey -file $fullPath
+		if (-not ($file | Test-Path)) {
+			NewCredentialsKey -file $file
 		}
-		$key = Get-Content $fullPath
+		$key = Get-Content $file
 	} Catch {
-		Write-Verbose "Failed to get $fullPath"
-		Break
+		Write-Verbose "Failed to get $file"
+		return $null
 	}
 	return $key
 }
@@ -60,17 +58,16 @@ function CredentialsToFile($file, $keyfile, $credentials) {
 		$User = $credentials.Username
 		$Pass = $credentials.GetNetworkCredential().Password
 		Add-Type -assemblyname System.DirectoryServices.AccountManagement 
-		$DS = New-Object System.DirectoryServices.AccountManagement.PrincipalContext([System.DirectoryServices.AccountManagement.ContextType]::Machine)
-		$Result = $DS.ValidateCredentials($User, $Pass)
-		if ($Result -ne "True") {
-			return $false
-		}
+		#$DS = New-Object System.DirectoryServices.AccountManagement.PrincipalContext([System.DirectoryServices.AccountManagement.ContextType]::Machine)
+		#$Result = $DS.ValidateCredentials($User, $Pass)
+		#if ($Result -ne "True") {
+		#	return $false
+		#}
 		$key = GetCredentialsKey -file $keyfile
 		$credentials.Password | ConvertFrom-SecureString -key $key | Out-File $file
 	} Catch {
 		Write-Verbose "Failed to save Credentials to $file"
 		return $false
-		Break
 	}
 	return $true
 }
@@ -78,12 +75,15 @@ function CredentialsToFile($file, $keyfile, $credentials) {
 function CredentialsFromFile($file, $keyfile, $username) {
 	$credentials = $null
 	Try {
-		$fullPath = Resolve-Path $file
 		$key = GetCredentialsKey -file $keyfile
-		$credentials = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $username, (Get-Content $fullPath | ConvertTo-SecureString -Key $key)
+		if ($key -ne $null -And (Test-Path $file)) {
+			$credentials = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $username, (Get-Content $file | ConvertTo-SecureString -Key $key)
+		} else {
+			return $null
+		}
 	} Catch {
 		Write-Verbose "Failed to get Credentials from $fullPath"
-		Break
+		return $null
 	}
 	return $credentials
 }
